@@ -1,0 +1,255 @@
+# Copyright (C) 2021 Nevo Sites Import
+# This file is distributed under the same license as the Nevo Sites Import package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nevo Sites Import\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: nevo-sites-import.php:3, includes/class-nevo-sites-import.php:171
+msgid "Nevo Sites Import"
+msgstr ""
+
+#: nevo-sites-import.php:4
+msgid "http://wordpress.org/plugins/nevo-sites-import"
+msgstr ""
+
+#: nevo-sites-import.php:5
+msgid "Collection of ready-to-use templates (demo sites) built for Elementor and Gutenberg."
+msgstr ""
+
+#: nevo-sites-import.php:7
+msgid "Nevo WordPress Theme"
+msgstr ""
+
+#: nevo-sites-import.php:8
+msgid "https://nevothemes.com/#about"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:172
+msgid "Sites Import"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:205
+msgid "Install & Activate"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:206
+msgid "Installing"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:207
+msgid "Activate"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:208
+msgid "Activating"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:209
+msgid "Active"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:211
+msgid "Upgrade Your License"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:212
+msgid "Please Activate Required Plugins"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:213
+msgid "Import This Site"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:214
+msgid "Validating data..."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:215
+msgid "Preparing import"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:216
+msgid "Importing contents..."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:217
+msgid "Importing theme options..."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:218
+msgid "Importing widgets..."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:219
+msgid "Importing other options..."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:220
+msgid "Finalizing import..."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:221
+msgid "Finished! Visit your site"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:223
+msgid ""
+"Before importing this site site, please note:\n"
+"\n"
+"1. It is recommended to run import on a fresh WordPress installation (no data has been added). You can reset to fresh installation using any \"WordPress reset\" plugin.\n"
+"\n"
+"2. Importing site site data into a non-fresh installation might overwrite your existing content.\n"
+"\n"
+"3. Copyrighted media will not be imported and will be replaced with placeholders.\n"
+"\n"
+""
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:225
+msgid "Warning! The import process is not finished yet. Do not close the window until import process complete, otherwise the imported data might be corrupted. Do you still want to leave the window?"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:227
+msgid "Failed to fetch site info"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:228
+msgid "Invalid plugin status, please refresh this page."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:229
+msgid "Invalid action, please refresh this page."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:230
+msgid "Invalid requirements for importing, please refresh this page."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:363
+msgid "No import info provided."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:419
+msgid "You are not permitted to import contents."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:425
+msgid "Invalid downloadable XML file URL specified."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:558
+msgid "Invalid XML file path."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:604
+msgid "You are not permitted to import customizer."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:610
+msgid "No customizer JSON file specified."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:663
+msgid "You are not permitted to import widgets."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:669
+msgid "No widgets JSON file specified."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:786
+msgid "You are not permitted to import options."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:792
+msgid "No options JSON file specified."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:885
+msgid "Nevo Sites Import (plugin) requires Nevo theme to be installed and activated."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:893
+msgid "Install and Activate Now"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:890
+msgid "Activate Now"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:934
+msgid "Show All"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:940
+msgid "Search site sites"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:941
+msgid "or enter keywords..."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:953
+msgid "Details & Preview"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:955
+msgid "Pro"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:963
+msgid "Select your page builder."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:968
+msgid "No site found. Try a different search."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:976
+msgid "Close"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:989
+msgid "Pro Demo Site"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:990
+msgid "To import this demo site you need an active license of {{ data.license_plan.name }} plan. Please upgrade or renew your license first."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:991
+msgid "If you already have an active license, please install the Nevo Pro plugin and activate your license on \"Appearance > Nevo\" page."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:999
+msgid "Make sure you disable the \"debug\" mode because it may disrupt the import process."
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:1000
+msgid "Learn how to disable debug mode"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:1007
+msgid "Required Plugins"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:1037
+msgid "Preview"
+msgstr ""
+
+#: includes/class-nevo-sites-import.php:1046
+msgid "Load More"
+msgstr ""
+
+#: includes/wxr-importer/class-nevo-wxr-importer.php:131
+msgid "Invalid uploaded XML file URL used."
+msgstr ""
