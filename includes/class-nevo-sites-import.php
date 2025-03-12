@@ -51,7 +51,7 @@ class Nevo_Sites_Import {
 	 * Class constructor
 	 */
 	protected function __construct() {
-		self::$api_url = apply_filters( 'nevo/sites_import/api_url', 'https://demo.nevothemes.com/demoimport/wp-json/nevo/v1/' );
+		self::$api_url = apply_filters( 'nevo/sites_import/api_url', 'https://demo.nevothemes.com/abc/wp-json/nevo/v1/' );
 
 		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
 		add_action( 'after_setup_theme', array( $this, 'init' ) );
