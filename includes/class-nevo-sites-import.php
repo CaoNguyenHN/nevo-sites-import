@@ -51,7 +51,7 @@ class Nevo_Sites_Import {
 	 * Class constructor
 	 */
 	protected function __construct() {
-		self::$api_url = apply_filters( 'nevo/sites_import/api_url', 'https://demo.nevothemes.com/abc/wp-json/nevo/v1/' );
+		self::$api_url = apply_filters( 'nevo/sites_import/api_url', 'https://demo.nevothemes.com/demoimport/wp-json/nevo/v1/' );
 
 		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
 		add_action( 'after_setup_theme', array( $this, 'init' ) );
@@ -77,6 +77,9 @@ class Nevo_Sites_Import {
 		// Check if Nevo theme is installed.
 		// If not, don't run the plugin and show an warning message on admin page.
 		if ( Nevo::$version || Nevo::$theme-name ) {
+			remove_action('nevo/dashboard/sidebar', array(Nevo_Dashboard::$_instance, 'box_plugins'), 8);
+			add_action('nevo/dashboard/sidebar', array( $this, 'sbox_plugins'), 8);
+			add_action('nevo/dashboard/sidebar', array( $this, 'box_child_themes'), 12);
 			add_filter( 'nevo/sites_import/scripts_data', array( $this, 'check_dev_mode' ) );
 
 			add_action( 'upload_mimes', array( $this, 'add_custom_mimes' ) );
@@ -110,7 +113,386 @@ class Nevo_Sites_Import {
 			add_action( 'admin_notices', array( $this, 'render_theme_not_installed_motice' ) );
 		}
 	}
+	
+	/**
+	 * Display recommend plugins
+	 */
+	function sbox_plugins() {
+		?>
+		<div class="cd-box box-plugins">
+			<div class="cd-box-top"><?php _e('Nevo ready to import Plugins', 'nevo-sites-import'); ?></div>
+			<div class="cd-sites-thumb">
+				<img src="<?php echo esc_url(get_template_directory_uri()) . '/assets/images/admin/sites_thumbnail.png'; ?>">
+			</div>
+			<div class="cd-box-content">
+				<p><?php _e('<strong>Nevo Sites</strong> is a free add-on for the Nevo theme which help you browse and import ready made websites with few clicks.', 'nevo-sites-import'); ?></p>
+				<?php
+				
+				// Define multiple plugins
+				$plugins = array(
+					'nevo-sites-import' => array(
+						'name'            => 'nevo-sites-import',
+						'active_filename' => 'nevo-sites-import/nevo-sites-import.php',
+						'github_repo'     => 'CaoNguyenHN/nevo-sites-import',
+						'github_branch'   => 'main',
+						'title'           => __('Nevo Sites Import', 'nevo-sites-import'),
+						'description'     => __('Import ready-made websites with a few clicks.', 'nevo-sites-import'),
+						'view_url'        => add_query_arg(
+							array(
+								'page' => 'nevo-sites-import',
+							),
+							admin_url('themes.php')
+						),
+						'view_text'       => __('View Site Library', 'nevo-sites-import'),
+					),
+					'custom-image-sizes' => array(
+						'name'            => 'custom-image-sizes',
+						'active_filename' => 'custom-image-sizes/custom-image-sizes.php',
+						'github_repo'     => 'CaoNguyenHN/custom-image-sizes',
+						'github_branch'   => 'main',
+						'title'           => __('Custom Image Sizes Manager', 'nevo-sites-import'),
+						'description'     => __('Add or remove custom image sizes in WordPress with enable/disable option in Media settings.', 'nevo-sites-import'),
+						'view_url'        => admin_url('options-media.php'),
+						'view_text'       => __('Media settings', 'nevo-sites-import'),
+					),
+					'nevo-user-social' => array(
+						'name'            => 'nevo-user-social',
+						'active_filename' => 'nevo-user-social/nevo-user-social.php',
+						'github_repo'     => 'CaoNguyenHN/nevo-user-social',
+						'github_branch'   => 'main',
+						'title'           => __('Nevo User Social', 'nevo-sites-import'),
+						'description'     => __('Add social fields to author/user profile.', 'nevo-sites-import'),
+						'view_url'        => admin_url('profile.php'),
+						'view_text'       => __('Profile settings', 'nevo-sites-import'),
+					),
+				);
+				
+				// Output each plugin
+				foreach ($plugins as $plugin_slug => $plugin_info) {
+					echo '<div class="plugin-container cd-box-shadow" id="plugin-' . esc_attr($plugin_slug) . '">';
+					echo '<h3>' . esc_html($plugin_info['title']) . '</h3>';
+					echo '<p>' . esc_html($plugin_info['description']) . '</p>';
+					
+					$plugin_info  = wp_parse_args(
+						$plugin_info,
+						array(
+							'name'            => '',
+							'active_filename' => '',
+							'github_repo'     => '',
+							'github_branch'   => 'main',
+							'view_url'        => '',
+							'view_text'       => __('View Plugin', 'nevo-sites-import'),
+						)
+					);
+					
+					$status       = is_dir(WP_PLUGIN_DIR . '/' . $plugin_slug);
+					$button_class = 'install-now button';
+					
+					if ($plugin_info['active_filename']) {
+						$active_file_name = $plugin_info['active_filename'];
+					} else {
+						$active_file_name = $plugin_slug . '/' . $plugin_slug . '.php';
+					}
 
+					if (!is_plugin_active($active_file_name)) {
+						$button_txt = esc_html__('Install Now', 'nevo-sites-import');
+						if (!$status) {
+							// For GitHub install, we'll use a custom AJAX action
+							$install_url = add_query_arg(
+								array(
+									'action' => 'install_github_plugin',
+									'plugin' => $plugin_slug,
+									'repo'   => $plugin_info['github_repo'],
+									'branch' => $plugin_info['github_branch'],
+									'_wpnonce' => wp_create_nonce('install-github-plugin_' . $plugin_slug),
+								),
+								admin_url('admin-ajax.php')
+							);
+						} else {
+							$install_url = add_query_arg(
+								array(
+									'action'        => 'activate',
+									'plugin'        => rawurlencode($active_file_name),
+									'plugin_status' => 'all',
+									'paged'         => '1',
+									'_wpnonce'      => wp_create_nonce('activate-plugin_' . $active_file_name),
+								),
+								network_admin_url('plugins.php')
+							);
+							$button_class = 'activate-now button-primary';
+							$button_txt   = esc_html__('Active Now', 'nevo-sites-import');
+						}
+
+						// No plugin-information for GitHub plugins, so we'll link to the GitHub repo
+						$detail_link = 'https://github.com/' . esc_attr($plugin_info['github_repo']);
+
+						echo '<div class="rcp">';
+						echo '<p class="action-btn plugin-card-' . esc_attr($plugin_slug) . '"><a href="' . esc_url($install_url) . '" data-slug="' . esc_attr($plugin_slug) . '" data-plugin-id="' . esc_attr($plugin_slug) . '" class="' . esc_attr($button_class) . '">' . $button_txt . '</a></p>'; // WPCS: XSS OK.
+						echo '<a class="plugin-detail" href="' . esc_url($detail_link) . '" target="_blank">' . esc_html__('Details', 'nevo-sites-import') . '</a>';
+						echo '</div>';
+					} else {
+						echo '<div class="rcp">';
+						echo '<p><a href="' . esc_url($plugin_info['view_url']) . '" data-slug="' . esc_attr($plugin_slug) . '" class="view-plugin">' . esc_html($plugin_info['view_text']) . '</a></p>'; // WPCS: XSS OK.
+						echo '</div>';
+					}
+					
+					echo '</div>'; // Close plugin-container
+				}
+				?>
+				<script type="text/javascript">
+					jQuery(document).ready(function($) {
+						// Store plugin data for reference
+						var pluginData = <?php echo json_encode($plugins); // phpcs:ignore ?>;
+						
+						$('#plugin-filter .box-plugins').on('click', '.install-now', function(e) {
+							e.preventDefault();
+							var button = $(this);
+							var url = button.attr('href');
+							var pluginId = button.data('plugin-id');
+							button.addClass('button installing updating-message');
+							
+							$.ajax({
+								url: url,
+								type: 'GET',
+								success: function(response) {
+									if (response.success) {
+										var activateUrl = response.data.activate_url;
+										button.attr('href', activateUrl);
+										button.attr('class', 'activate-now button-primary');
+										button.text('<?php echo esc_js(__('Active Now', 'nevo-sites-import')); ?>');
+									} else {
+										button.removeClass('button installing updating-message');
+										alert(response.data.message || 'Installation failed');
+									}
+								},
+								error: function() {
+									button.removeClass('button installing updating-message');
+									alert('<?php echo esc_js(__('Installation failed', 'nevo-sites-import')); ?>');
+								}
+							});
+						});
+						
+						$('#plugin-filter .box-plugins').on('click', '.activate-now', function(e) {
+							e.preventDefault();
+							var button = $(this);
+							var url = button.attr('href');
+							var pluginId = button.data('plugin-id');
+							var pluginInfo = pluginData[pluginId];
+							button.addClass('button installing updating-message');
+							
+							$.get(url, function() {
+								var container = button.closest('.plugin-container');
+								container.find('.plugin-detail').hide();
+								button.attr('href', pluginInfo.view_url);
+								button.attr('class', 'view-plugin');
+								button.text(pluginInfo.view_text);
+							});
+						});
+					});
+				</script>
+			</div>
+		</div>
+		<?php
+	}
+
+	function box_child_themes() {
+		?>
+		<div class="cd-box box-child-themes">
+			<div class="cd-box-top"><?php _e('Nevo ready to import child themes', 'nevo-sites-import'); ?></div>
+			<div class="cd-box-body">
+				<?php
+				// Define multiple child themes
+				$child_themes = array(
+					'nevo-basic-child' => array(
+						'name'          => 'nevo-basic-child',
+						'github_repo'   => 'CaoNguyenHN/nevo-basic-child',
+						'github_branch' => 'main',
+						'title'         => __('Nevo Basic Child Theme', 'nevo-sites-import'),
+						'description'   => __('A basic child theme for Nevo.', 'nevo-sites-import'),
+						'preview_url'   => 'https://github.com/CaoNguyenHN/nevo-basic-child',
+						'screenshot_url' => 'https://raw.githubusercontent.com/caonguyenhn/nevo-basic-child/master/screenshot.png',
+					),
+					'nevo-child' => array(
+						'name'          => 'nevo-child',
+						'github_repo'   => 'CaoNguyenHN/nevo-child',
+						'github_branch' => 'main',
+						'title'         => __('Nevo Child Theme', 'nevo-sites-import'),
+						'description'   => __('Default Nevo child theme For Classic EDITOR. This version includes optimization functions - removing some unnecessary functions for Wordpres Website. You can find and customize in the nevo-child/functions.php file.', 'nevo-sites-import'),
+						'preview_url'   => 'https://github.com/CaoNguyenHN/nevo-child',
+						'screenshot_url' => 'https://raw.githubusercontent.com/caonguyenhn/nevo-child/master/screenshot.png',
+					),
+					'nevo-child-block' => array(
+						'name'          => 'nevo-child-block',
+						'github_repo'   => 'CaoNguyenHN/nevo-child-block',
+						'github_branch' => 'main',
+						'title'         => __('Nevo Child Block Theme', 'nevo-sites-import'),
+						'description'   => __('The default child theme for the Nevo parent theme uses blocks (Gutenberg), which is a theme that contains pre-built block templates. This version includes optimization functions - removing some unnecessary functions for Wordpres Website. You can find and customize in the nevo-child/functions.php file.', 'nevo-sites-import'),
+						'preview_url'   => 'https://github.com/CaoNguyenHN/nevo-child-block',
+						'screenshot_url' => 'https://raw.githubusercontent.com/caonguyenhn/nevo-child-block/master/screenshot.png',
+					),
+				);
+				
+				// Get current active theme
+				$current_theme = wp_get_theme();
+				$current_theme_slug = $current_theme->get_stylesheet();
+				
+				// Output each child theme
+				foreach ($child_themes as $theme_slug => $theme_info) {
+					echo '<div class="cd-box-content cd-box-shadow" id="theme-' . esc_attr($theme_slug) . '">';
+					echo '<div class="cd-sites-thumb"><img src="' . esc_html($theme_info['screenshot_url']) . '"></div>';
+					echo '<h3>' . esc_html($theme_info['title']) . '</h3>';
+					echo '<p>' . esc_html($theme_info['description']) . '</p>';
+					
+					$theme_info = wp_parse_args(
+						$theme_info,
+						array(
+							'name'          => '',
+							'github_repo'   => '',
+							'github_branch' => 'main',
+							'preview_url'   => '',
+						)
+					);
+					
+					$theme_exists = wp_get_theme($theme_slug)->exists();
+					$is_active = ($current_theme_slug === $theme_slug);
+					
+					$button_class = 'install-now button';
+					$button_txt = esc_html__('Install Now', 'nevo-sites-import');
+					
+					// Child theme is not installed
+					if (!$theme_exists) {
+						// For GitHub install, use a custom AJAX action
+						$install_url = add_query_arg(
+							array(
+								'action'   => 'install_github_child_theme',
+								'theme'    => $theme_slug,
+								'repo'     => $theme_info['github_repo'],
+								'branch'   => $theme_info['github_branch'],
+								'_wpnonce' => wp_create_nonce('install-github-child-theme_' . $theme_slug),
+							),
+							admin_url('admin-ajax.php')
+						);
+					} 
+					// Child theme is installed but not active
+					elseif ($theme_exists && !$is_active) {
+						$install_url = add_query_arg(
+							array(
+								'action'     => 'activate',
+								'stylesheet' => rawurlencode($theme_slug),
+								'_wpnonce'   => wp_create_nonce('switch-theme_' . $theme_slug),
+							),
+							admin_url('themes.php')
+						);
+						$button_class = 'activate-now button-primary';
+						$button_txt   = esc_html__('Activate Now', 'nevo-sites-import');
+					} 
+					// Child theme is installed and active
+					else {
+						$install_url = '#';
+						$button_class = 'button disabled';
+						$button_txt   = esc_html__('Active Theme', 'nevo-sites-import');
+					}
+
+					// Preview link
+					$detail_link = $theme_info['preview_url'];
+
+					echo '<div class="rcp">';
+					
+					// Don't add data attributes to the disabled button
+					if ($is_active) {
+						echo '<p class="action-btn theme-card-' . esc_attr($theme_slug) . '"><a href="' . esc_url($install_url) . '" class="' . esc_attr($button_class) . '">' . $button_txt . '</a></p>';
+					} else {
+						echo '<p class="action-btn theme-card-' . esc_attr($theme_slug) . '"><a href="' . esc_url($install_url) . '" data-slug="' . esc_attr($theme_slug) . '" data-theme-id="' . esc_attr($theme_slug) . '" class="' . esc_attr($button_class) . '">' . $button_txt . '</a></p>';
+					}
+					
+					echo '<a class="theme-detail plugin-detail" href="' . esc_url($detail_link) . '" target="_blank">' . esc_html__('Preview', 'nevo-sites-import') . '</a>';
+					echo '</div>';
+					
+					echo '</div>'; // Close theme-container
+				}
+				?>
+				<script type="text/javascript">
+					jQuery(document).ready(function($) {
+						// Store theme data for reference
+						var themeData = <?php echo json_encode($child_themes); // phpcs:ignore ?>;
+						
+						// Install button click handler
+						$('.box-child-themes .install-now').on('click', function(e) {
+							e.preventDefault();
+							var button = $(this);
+							var url = button.attr('href');
+							var themeId = button.data('theme-id');
+							
+							console.log('Install button clicked');
+							console.log('URL:', url);
+							console.log('Theme ID:', themeId);
+							
+							button.addClass('installing updating-message');
+							button.text('<?php echo esc_js(__('Installing...', 'nevo-sites-import')); ?>');
+							
+							$.ajax({
+								url: url,
+								type: 'GET',
+								dataType: 'json',
+								success: function(response) {
+									console.log('Response:', response);
+									if (response.success) {
+										var activateUrl = response.data.activate_url;
+										button.attr('href', activateUrl);
+										button.removeClass('install-now installing updating-message');
+										button.addClass('activate-now button-primary');
+										button.text('<?php echo esc_js(__('Activate Now', 'nevo-sites-import')); ?>');
+										
+										// Cập nhật event handler cho nút mới
+										button.off('click');
+										button.on('click', activateClickHandler);
+									} else {
+										button.removeClass('installing updating-message');
+										button.text('<?php echo esc_js(__('Install Now', 'nevo-sites-import')); ?>');
+										alert(response.data.message || 'Installation failed');
+									}
+								},
+								error: function(xhr, status, error) {
+									console.log('Error:', xhr.responseText);
+									button.removeClass('installing updating-message');
+									button.text('<?php echo esc_js(__('Install Now', 'nevo-sites-import')); ?>');
+									alert('<?php echo esc_js(__('Installation failed', 'nevo-sites-import')); ?>: ' + error);
+								}
+							});
+						});
+						
+						// Định nghĩa hàm xử lý sự kiện click cho nút Activate
+						function activateClickHandler(e) {
+							e.preventDefault();
+							var button = $(this);
+							var url = button.attr('href');
+							
+							console.log('Activate button clicked');
+							console.log('URL:', url);
+							
+							button.addClass('updating-message');
+							button.text('<?php echo esc_js(__('Activating...', 'nevo-sites-import')); ?>');
+							
+							// Chuyển hướng đến trang kích hoạt
+							window.location.href = url;
+							return false;
+						}
+						
+						// Đăng ký sự kiện cho các nút Activate đã tồn tại
+						$('.box-child-themes .activate-now').on('click', activateClickHandler);
+						
+						// Disable "Active Theme" buttons
+						$('.box-child-themes .disabled').on('click', function(e) {
+							e.preventDefault();
+							return false;
+						});
+					});
+				</script>
+			</div>
+		</div>
+		<?php
+	}
+	
 	/**
 	 * Check if we are in development mode, pass a flag status to the javascript via `localize_script` variable.
 	 *
@@ -884,12 +1266,12 @@ class Nevo_Sites_Import {
 				<?php
 				esc_html_e( 'Nevo Sites Import (plugin) requires Nevo theme to be installed and activated.', 'nevo-sites-import' );
 
-				$theme = wp_get_theme( 'nevo' );
+				$theme = wp_get_theme( 'nevo-sites-import' );
 				if ( $theme->exists() ) {
-					$url   = esc_url( add_query_arg( 'theme', 'nevo', admin_url( 'themes.php' ) ) );
+					$url   = esc_url( add_query_arg( 'theme', 'nevo-sites-import', admin_url( 'themes.php' ) ) );
 					$label = esc_html__( 'Activate Now', 'nevo-sites-import' );
 				} else {
-					$url   = esc_url( add_query_arg( 'search', 'nevo', admin_url( 'theme-install.php' ) ) );
+					$url   = esc_url( add_query_arg( 'search', 'nevo-sites-import', admin_url( 'theme-install.php' ) ) );
 					$label = esc_html__( 'Install and Activate Now', 'nevo-sites-import' );
 				}
 
@@ -1157,3 +1539,181 @@ class Nevo_Sites_Import {
 
 // Initialize plugin.
 Nevo_Sites_Import::instance();
+// Add the AJAX handler for installing GitHub plugins
+add_action('wp_ajax_install_github_plugin', 'nevo_install_github_plugin');
+function nevo_install_github_plugin() {
+	// Check for permissions
+	if (!current_user_can('install_plugins')) {
+		wp_send_json_error(array('message' => __('You do not have permission to install plugins.', 'nevo-sites-import')));
+	}
+	
+	// Verify nonce
+	if (!isset($_GET['_wpnonce']) || !wp_verify_nonce($_GET['_wpnonce'], 'install-github-plugin_' . $_GET['plugin'])) {
+		wp_send_json_error(array('message' => __('Security check failed.', 'nevo-sites-import')));
+	}
+	
+	// Get parameters
+	$plugin_slug = isset($_GET['plugin']) ? sanitize_text_field($_GET['plugin']) : '';
+	$repo = isset($_GET['repo']) ? sanitize_text_field($_GET['repo']) : '';
+	$branch = isset($_GET['branch']) ? sanitize_text_field($_GET['branch']) : 'main';
+	
+	if (empty($plugin_slug) || empty($repo)) {
+		wp_send_json_error(array('message' => __('Missing required parameters.', 'nevo-sites-import')));
+	}
+	
+	// Download the ZIP file from GitHub
+	$download_url = "https://github.com/{$repo}/archive/refs/heads/{$branch}.zip";
+	$download_file = download_url($download_url);
+	
+	if (is_wp_error($download_file)) {
+		wp_send_json_error(array('message' => $download_file->get_error_message()));
+	}
+	
+	// Unzip the file
+	$plugins_dir = WP_PLUGIN_DIR;
+	
+	// Properly initialize WP_Filesystem
+	global $wp_filesystem;
+	if (!function_exists('WP_Filesystem')) {
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+	}
+	
+	// Initialize with proper context - using direct method when possible
+	$creds = request_filesystem_credentials('', '', false, false, null);
+	if (!WP_Filesystem($creds, '')) {
+		@unlink($download_file); // Clean up the downloaded file
+		wp_send_json_error(array('message' => __('Could not initialize filesystem.', 'nevo-sites-import')));
+		return;
+	}
+	
+	$unzip_result = unzip_file($download_file, $plugins_dir);
+	
+	// Clean up the downloaded zip file
+	@unlink($download_file);
+	
+	if (is_wp_error($unzip_result)) {
+		wp_send_json_error(array('message' => $unzip_result->get_error_message()));
+	}
+	
+	// GitHub unzips to folder named {repo}-{branch}, but we need to rename it to match our plugin slug
+	$extracted_folder = trailingslashit($plugins_dir) . basename($repo) . '-' . $branch;
+	$target_folder = trailingslashit($plugins_dir) . $plugin_slug;
+	
+	// Remove target folder if it exists (for updates)
+	if (is_dir($target_folder)) {
+		$wp_filesystem->delete($target_folder, true);
+	}
+	
+	// Rename the folder
+	$rename_result = $wp_filesystem->move($extracted_folder, $target_folder);
+	
+	if (!$rename_result) {
+		wp_send_json_error(array('message' => __('Failed to rename plugin folder.', 'nevo-sites-import')));
+	}
+	
+	// Create activation URL
+	$active_file_name = $plugin_slug . '/' . $plugin_slug . '.php';
+	$activate_url = add_query_arg(
+		array(
+			'action'        => 'activate',
+			'plugin'        => rawurlencode($active_file_name),
+			'plugin_status' => 'all',
+			'paged'         => '1',
+			'_wpnonce'      => wp_create_nonce('activate-plugin_' . $active_file_name),
+		),
+		network_admin_url('plugins.php')
+	);
+	
+	wp_send_json_success(array(
+		'message' => __('Plugin installed successfully.', 'nevo-sites-import'),
+		'activate_url' => $activate_url
+	));
+}
+
+// Add the AJAX handler for installing GitHub child themes
+add_action('wp_ajax_install_github_child_theme', 'nevo_install_github_child_theme');
+function nevo_install_github_child_theme() {
+	// Check for permissions
+	if (!current_user_can('install_themes')) {
+		wp_send_json_error(array('message' => __('You do not have permission to install themes.', 'nevo-sites-import')));
+	}
+	
+	// Verify nonce
+	if (!isset($_GET['_wpnonce']) || !wp_verify_nonce($_GET['_wpnonce'], 'install-github-child-theme_' . $_GET['theme'])) {
+		wp_send_json_error(array('message' => __('Security check failed.', 'nevo-sites-import')));
+	}
+	
+	// Get parameters
+	$theme_slug = isset($_GET['theme']) ? sanitize_text_field($_GET['theme']) : '';
+	$repo = isset($_GET['repo']) ? sanitize_text_field($_GET['repo']) : '';
+	$branch = isset($_GET['branch']) ? sanitize_text_field($_GET['branch']) : 'main';
+	
+	if (empty($theme_slug) || empty($repo)) {
+		wp_send_json_error(array('message' => __('Missing required parameters.', 'nevo-sites-import')));
+	}
+	
+	// Download the ZIP file from GitHub
+	$download_url = "https://github.com/{$repo}/archive/refs/heads/{$branch}.zip";
+	$download_file = download_url($download_url);
+	
+	if (is_wp_error($download_file)) {
+		wp_send_json_error(array('message' => $download_file->get_error_message()));
+	}
+	
+	// Unzip the file
+	$themes_dir = get_theme_root();
+	
+	// Properly initialize WP_Filesystem
+	global $wp_filesystem;
+	if (!function_exists('WP_Filesystem')) {
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+	}
+	
+	// Initialize with proper context - using direct method when possible
+	$creds = request_filesystem_credentials('', '', false, false, null);
+	if (!WP_Filesystem($creds, '')) {
+		@unlink($download_file); // Clean up the downloaded file
+		wp_send_json_error(array('message' => __('Could not initialize filesystem.', 'nevo-sites-import')));
+		return;
+	}
+	
+	$unzip_result = unzip_file($download_file, $themes_dir);
+	
+	// Clean up the downloaded zip file
+	@unlink($download_file);
+	
+	if (is_wp_error($unzip_result)) {
+		wp_send_json_error(array('message' => $unzip_result->get_error_message()));
+	}
+	
+	// GitHub unzips to folder named {repo}-{branch}, but we need to rename it to match our theme slug
+	$extracted_folder = trailingslashit($themes_dir) . basename($repo) . '-' . $branch;
+	$target_folder = trailingslashit($themes_dir) . $theme_slug;
+	
+	// Remove target folder if it exists (for updates)
+	if (is_dir($target_folder)) {
+		$wp_filesystem->delete($target_folder, true);
+	}
+	
+	// Rename the folder
+	$rename_result = $wp_filesystem->move($extracted_folder, $target_folder);
+	
+	if (!$rename_result) {
+		wp_send_json_error(array('message' => __('Failed to rename theme folder.', 'nevo-sites-import')));
+	}
+	
+	// Create activation URL
+	$activate_url = add_query_arg(
+		array(
+			'action'     => 'activate',
+			'stylesheet' => rawurlencode($theme_slug),
+			'_wpnonce'   => wp_create_nonce('switch-theme_' . $theme_slug),
+		),
+		admin_url('themes.php')
+	);
+	
+	wp_send_json_success(array(
+		'message' => __('Child theme installed successfully.', 'nevo-sites-import'),
+		'activate_url' => $activate_url
+	));
+}
