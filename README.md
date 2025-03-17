@@ -1,4 +1,4 @@
-Nevo Sites is a free add-on for the Nevo theme which help you browse and import ready made websites with few clicks.
+## Nevo Sites Import is a free add-on for the Nevo theme which help you browse and import ready made websites with few clicks.
 
 #### **How to Use Nevo Sites Import Plugin:**
 
