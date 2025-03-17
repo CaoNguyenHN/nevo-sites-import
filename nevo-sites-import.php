@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: Nevo Sites Import
- * Plugin URI: http://wordpress.org/plugins/nevo-sites-import
+ * Plugin URI: https://github.com/CaoNguyenHN/nevo-sites-import
  * Description: Collection of ready-to-use templates (demo sites) built for Elementor and Gutenberg.
  * Version: 0.0.1
- * Author: Nevo WordPress Theme
- * Author URI: https://nevothemes.com/#about
+ * Author: NevoTheme
+ * Author URI: https://nevothemes.com/
  * License: GNU General Public License v2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: nevo-sites-import
