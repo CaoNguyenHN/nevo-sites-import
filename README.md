@@ -7,3 +7,7 @@
 2. Go to **Plugins** > **Add New**.
 3. Install the **Nevo Sites Import** plugin.
 4. After installation, go to **Theme** > **Sites Import** to start import the data.
+
+## Nevo Site Import also has another function where you can Install Child Themes and other extensions. 
+
+After installation, go to **Theme** > **Nevo Options** > to sidebar.
